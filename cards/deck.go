@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 // Create a new type of 'deck' which is a slice of strings
@@ -44,4 +46,35 @@ func (d deck) toString() string {
 }
 func (d deck) saveToFile(filename string) error {
 	return os.WriteFile(filename, []byte(d.toString()), 0666)
+	// saves in a plain text file within the same folder as our code
+	// 0666 gives read and write permissions to the file for everyone
+}
+
+func newDeckFromFile(filename string) deck {
+	bs, err := os.ReadFile(filename) //byteslice, error
+	if err != nil {
+		// option #1: log the error and return a call to newDeck()
+		// option #2: log the error and entirely quit the program
+		fmt.Println("Error: ", err)
+		os.Exit(1)
+	}
+
+	s := strings.Split(string(bs), ",")
+	// deck(strings.Split(string(bs), ","))
+	return deck(s)
+}
+
+func (d deck) shuffle() {
+
+	for i := range d {
+
+		source := rand.NewSource(time.Now().UnixNano())
+		r := rand.New(source)
+
+		// newPosition := rand.Intn(len(d) - 1)
+		newPosition := r.Intn(len(d) - 1)
+		d[i], d[newPosition] = d[newPosition], d[i]
+		// Fancy swap line
+	}
+
 }

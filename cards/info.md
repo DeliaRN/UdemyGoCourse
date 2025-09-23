@@ -35,11 +35,13 @@ when you use it: ```card := newCard()``` the type of ```card``` will be inferred
 Type we want (value we have)
 []byte("Hi there!")
 Float(3)
+
 ```
 greeting := "Hi there!"
 fmt.Printkln([]byte(greeting))
 ```
-This will print: [72 105 32 116 104 101 114 101 33]
+
+This will print:```[72 105 32 116 104 101 114 101 33]```
 
 Deck -> []string -> string -> []byte
 
@@ -139,11 +141,96 @@ To assign different values returned at the same time in different variables, we 
 First result to first var, second to second.
 
 
+byteSlice, err := os.ReadFile(filename)
+If nothing goes wrong, 'error' will have a value of 'nil'
 
+
+# TESTING
+
+Go testing is not RSpec, selenium, mocha, jasmine...
+
+- To make a test we create a new file ending in ```_test.go``` 
+
+- To run tests in a package, we use ```go test```
+
+Writing tests in go is actually done by just writting simple go code that tests the desired file.
+
+
+## How to know what to test
+
+Deciding what to test is part of the logic behind testing.
+It's about deciding what do we care about as developers:
+
+With the example of the deck, it makes sense to test that...
+- ... for ```func TestNewDeck``` ...
+	- ... the deck has 52 cards
+	- ... the first one is an Ace and last is a King.
+	- ... it's not empty
+- ... for ```func TestSaveToFile``` ...
+	- ... the file is created
+	-
+- ... for ```func TestNewDeckFromFile``` ...
+	- ... the deck is there
+	- ... the deck is lodaed
+
+etc.
+
+Then for ```func TestNewDeck```, we should create a new test and write an if statement that checks the number of cards.
+
+
+## Naming conventions
+
+- Why is it ```func newDeck``` with regular 'n', and the test is ```func TestNewDeck``` with capital 'n'?
+
+- What is ```t *testing.T```in funcion declaration?
+
+
+## Running them
+
+```go test``` : Almost no Feedback in case they pass.
+```
+go test
+PASS
+ok  	cards	0.776s
+```
+
+
+
+```go test -v``` : Adding '-v' flag to the command provides a more detailed (verbose) feedback.
+```
+go test -v
+=== RUN   TestNewDeck
+--- PASS: TestNewDeck (0.00s)
+PASS
+ok  	cards	0.384s
+```
 
 
 # PACKAGES
 
-## ioutil
+## ioutil or os
 It implements some common operations for working with the underlying hard drive on our working machine.
+
+ioutil is deprecated since 1.16. Now we use 'os' instead, which provided platform-independent interface to operating system functionality.
+
+os.Exit(0) -> 0 code indicates success.
+os.Exit(1) -> Non-zero indicates an error.
+
+```func Remove(name string) error```
+Removes the named file or directory. If there's an error, it will be of type *PathError
+
+## strings
+It implements operations to work with UTF-8 encoded strings
+
+
+## math
+### math/rand
+It implements pseudo-random number generators
+```rand.Intn(n int) int```
+It use a Seed as a 'source' in which is based the randomization.
+```func NewSource (seed int64) Source```
+```func (r *Rand) Intn(n int) int```
+
+## time
+func (t Time) UnixNano() int64 : It returns t as a Unix time, so everythime the application
 

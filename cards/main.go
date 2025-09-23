@@ -5,9 +5,13 @@ package main
 func main() {
 
 	//making a slice of cards:
-	cards := newDeck()
+
 	/*
 		TESTING FUNCTIONS:
+
+		CREATE A NEW DECK:
+			cards := newDeck()
+			cards.print()
 
 		DEAL FUNCTION:
 			hand, remainingCards := deal(cards, 5)
@@ -22,9 +26,18 @@ func main() {
 		TO STRING FUNCTION:
 		stringedCards := cards.toString()
 		fmt.Println(stringedCards)
+
+		SAVE TO FILE FUNCTION:
+		cards.saveToFile("my_deck")
+
+		OPEN EXISTING DECK:
+		cards := newDeckFromFile("my_deck")
+		cards.print()
 	*/
 
-	cards.saveToFile("my_deck")
+	cards := newDeck()
+	cards.shuffle()
+	cards.print()
 
 }
 
