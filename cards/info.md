@@ -217,7 +217,8 @@ os.Exit(0) -> 0 code indicates success.
 os.Exit(1) -> Non-zero indicates an error.
 
 ```func Remove(name string) error```
-Removes the named file or directory. If there's an error, it will be of type *PathError
+Removes the named file or directory. If there's an error, it will be of type ```*PathError```
+
 
 ## strings
 It implements operations to work with UTF-8 encoded strings
