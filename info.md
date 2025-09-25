@@ -283,8 +283,43 @@ type person struct {
 If we print this with the %+v verb, as in Emily's sample, we'll get:
 ```{firstName:Jim lastName:Party contact:{email:jp@email.com zipCode:12345}}```
 
+## Anonymous fields
 
+An anonymous field is a field without a name, only a type. We can use this to embed a struct within another struct. This way we can access the fields of the embedded struct directly from the outer struct:
 
+```
+type person struct {
+	firstName string
+	lastName  string
+	contactInfo		
+}
+```
+Here, ```contactInfo``` is an anonymous field. We can access the fields of contactInfo directly from person
+
+This, however, is not recommended because it can lead to confusion.
+
+It would be used as: 
+```
+jim := person{
+	firstName: "Jim",
+	lastName:  "Party",
+	contactInfo: contactInfo{
+		email:   "email.com",
+		zipCode: 12345,
+	},
+}
+```
+
+## Receivers and structs
+
+This function takes a person as a receiver:
+```
+func (p person) print() {
+	fmt.Printf("%+v", p)
+}
+```
+
+This way, we can call ```jim.print()``` instead of doing ```fmt.Printf("%+v, jim")``` and the result will be the same.
 
 
 # PACKAGES
