@@ -90,7 +90,7 @@ So, a byteslice is a computer-friendly way to represent a string.
 
 
 
-## Go is not OO
+# Go is not OO
 Therefore, we need to "extend" a base type and add some extra functionality to it so it behaves as classes behave in OO languages.
 
 - Java: ```Class Deck```
@@ -204,6 +204,87 @@ go test -v
 PASS
 ok  	cards	0.384s
 ```
+
+
+# STRUCTS
+
+Structs are collections of fields. They are useful to group data together to form records. They are similar to classes in other languages, but they don't have methods.
+
+```
+type person struct {
+	firstName string
+	lastName  string
+}
+```
+
+There are several approaches on how to use them and declare them:
+
+Standard:
+```
+alex := person{
+	firstName: "Alex",
+	lastName:  "Anderson",
+}
+```
+
+Short one:
+
+```jack := person{"Jack", "Johnson"}```
+We **shouldn't use Jack's approach**, since it depends on the order of fields in the struct.
+With Alex, the order doesn't matter because we are using field names. It's ok as long as we use all fields.
+
+```fmt.Println(alex)```// {Alex Anderson}
+
+With Emily, we can create empty srtucts that will be filled with zero values for all fields
+```var emily person```
+
+```fmt.Println(emily)``` // {  } - both fields are empty strings
+
+We can also use ```Printf``` and ```%+v``` verb to show field names, so we can have more info:
+
+```fmt.Printf("%+v", emily)``` // {firstName: lastName:} 
+
+We can also asign values to the files of an struct just by calling them like in some many other languages:
+```
+emily.firstName = "Emily"
+emily.lastName = "Evans"
+```
+
+```fmt.Printf("%+v", emily)``` // {firstName:Emily lastName:Evans}
+
+
+## Embedded structs
+
+Structs can be embedded inside one another.
+```
+type contactInfo struct {
+	email   string
+	zipCode int
+}
+
+type person struct {
+	firstName string
+	lastName  string
+	contact   contactInfo
+}
+```
+
+```
+	jim := person{
+		firstName: "Jim",
+		lastName:  "Party",
+		contact: contactInfo{
+			email:   "jp@email.com",
+			zipCode: 12345,
+		},
+	}
+```
+
+If we print this with the %+v verb, as in Emily's sample, we'll get:
+```{firstName:Jim lastName:Party contact:{email:jp@email.com zipCode:12345}}```
+
+
+
 
 
 # PACKAGES
