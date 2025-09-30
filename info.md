@@ -457,8 +457,27 @@ Collections of key value pairs.
 Both keys and values are statically typed, so all keys must be all the same type.
 In the same way, values of a map must be all the same type too.
 
+```
+color := map[string]string {
+		"red":   "#ff0000",
+		"green": "#4bf745",
+	}
+```
 
+- We can declare it and not initialize it:
 
+`var colorMap map[string]string`
+ but, if we print it, it will be initialized by go with a zero value. 
+
+- We can also create it with ```make```:
+
+`colorMap := make(map[string]string)`
+
+- We can add key-value pairs just by declaring them:
+
+`color["white"] = #ffffff`
+
+Now, if we print `color`, it will be: `map[green:#4bf745 red:#ff0000 white:#ffffff]`
 
 
 # PACKAGES
