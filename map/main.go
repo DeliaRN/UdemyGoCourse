@@ -4,17 +4,20 @@ import "fmt"
 
 func main() {
 
-	//var colorMap map[string]string
-
-	//colorsMap := make(map[string]string)
+	//var colorMap1 map[string]string
+	//colorMap2 := make(map[string]string)
 
 	colors := map[string]string{
 		"red":   "#ff0000",
 		"green": "#4bf745",
+		"white": "#ffffff",
 	}
 
-	colors["white"] = "#ffffff"
+	printMap(colors)
+}
 
-	fmt.Println(colors)
-
+func printMap(c map[string]string) {
+	for color, hex := range c {
+		fmt.Println(color, hex)
+	}
 }
