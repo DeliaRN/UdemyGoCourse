@@ -145,6 +145,120 @@ First result to first var, second to second.
 byteSlice, err := os.ReadFile(filename)
 If nothing goes wrong, 'error' will have a value of 'nil'
 
+# FUNCTIONS
+A function allows you to group code into a reusable unit.
+
+func keyword + name of the function + comma-separated list of zero or more parameters and types in round brackets.
+
+## Function Parameters
+All parameters must be explicitly typed; there is no type inference for parameters.
+
+There are no default values for parameters so all function parameters are required.
+
+- No parameters:
+```
+func PrintHello() {
+    fmt.Println("Hello")
+}
+```
+
+- One parameter:
+```
+func PrintHelloName(name string) {
+  fmt.Println("Hello " + name)
+}
+```
+Parameters of the same type can be declared together, followed by a single type declaration.
+
+```
+func PrintGreetingName(greeting, name string) {
+  fmt.Println(greeting + " " + name)
+}
+```
+
+## Parameters vs. Arguments
+
+- **Function parameters** are the names defined in the function's signature,
+such as `greeting` and `name` in the function `PrintGreetingName` above.
+
+- **Function arguments** are the concrete values passed to the function parameters when we invoke the function.
+`"Hello"` and `"Katrina"` are the arguments passed to the `greeting` and `name` parameters:
+
+```
+PrintGreetingName("Hello", "Katrina")
+```
+
+
+## Return Values
+
+Function parameters can be followed by return values that must also be explicitly typed.
+
+- Single return values:
+```
+func Hello(name string) string {
+  return "Hello " + name
+}
+```
+
+- Multiple return values: 
+
+```
+func HelloAndGoodbye(name string) (string, string) {
+  return "Hello " + name, "Goodbye " + name
+}
+```
+
+Values are returned using `return` keyword at the end of the function.
+There can be multiple `return` statements in a function.
+The function ends as it hits one of those `return` statements
+
+
+## Invoking Functions
+Invoking a function is done by specifying the function name and passing arguments for each of the function's parameters in parenthesis.
+
+
+- **No parameters**, no return value:
+```
+func PrintHello() {
+    fmt.Println("Hello")
+}
+```
+Called like this:	`PrintHello()`
+
+
+- **One parameter**, one return value:
+```
+func Hello(name string) string {
+  return "Hello " + name
+}
+```
+Called like this: `greeting := Hello("Dave")`
+
+- **Multiple parameters**, multiple return values:
+```
+func SumAndMultiply(a, b int) (int, int) {
+    return a+b, a*b
+}
+```
+Called like this: `aplusb, atimesb := SumAndMultiply(a, b)`
+
+
+
+### Named Return Values and Naked Return
+As well as parameters, return values can optionally be named.
+If named return values are used, a return statement without arguments
+will return those values. This is known as a **'naked' return**.
+
+```
+func SumAndMultiplyThenMinus(a, b, c int) (sum, mult int) {
+    sum, mult = a+b, a*b
+    sum -= c
+    mult -= c
+    return
+}
+```
+
+
 
 # TESTING
 
@@ -459,8 +573,8 @@ In the same way, values of a map must be all the same type too.
 
 ```
 color := map[string]string {
-		"red":   "#ff0000",
-		"green": "#4bf745",
+		"Red":   "#ff0000",
+		"Green": "#4bf745",
 	}
 ```
 
@@ -473,11 +587,65 @@ color := map[string]string {
 
 `colorMap := make(map[string]string)`
 
-- We can add key-value pairs just by declaring them:
+- We can **add** key-value pairs just by declaring them:
 
-`color["white"] = #ffffff`
+`color["White"] = #ffffff`
 
 Now, if we print `color`, it will be: `map[green:#4bf745 red:#ff0000 white:#ffffff]`
+
+
+- We can **delete** key-value pairs with `delete`function,
+passing the name of the map and the key we want to delete.
+
+`delete(colors, "White")`
+
+## Iterating over maps
+```
+func printMap(c map[string]string) {
+	for color, hex := range c {
+		fmt.Println(color, hex)
+	}
+}
+```
+
+Each run of this function, will print the map 
+in a different order. That's because, in Go,
+ maps are unordered.
+
+
+White #ffffff
+Red #ff0000
+Green #4bf745
+
+
+Red #ff0000
+Green #4bf745
+White #ffffff
+
+In the same way, maps do not allow repeated 
+elements. If we tried to add a key that already
+ exists, it will be marked as an error by the IDE and won't compile 
+
+
+## Maps VS Structs
+
+In maps keys must share type, and values must share type.
+In structs, types can be of different type.
+
+In maps, keys are indexed, and we can iterate them. 
+In structs, keys do not support indexing.
+
+In maps, you don't need to know all the keys at compile time.
+In structs, you do.
+
+Map is a reference type
+Structs are value type.
+
+Maps are used to represent a collection of related properties.
+Structs are sued to represent a "thing" with a lot of different properties.
+
+
+
 
 
 # PACKAGES
