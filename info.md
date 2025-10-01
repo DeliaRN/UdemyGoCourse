@@ -436,6 +436,22 @@ func (p person) print() {
 
 This way, we can call ```jim.print()``` instead of doing ```fmt.Printf("%+v, jim")``` and the result will be the same.
 
+If we do not really use the value (`p`or `eb`in these examples)...
+```
+func (eb englishBot) getGreeting() string {
+	// VERY custom logic for English blablabla
+	return "Hi!"
+}
+```
+we can take it out!
+```
+func (englishBot) getGreeting() string {
+	// VERY custom logic for English blablabla
+	return "Hi!"
+}
+```
+
+
 # Pointers
 
 ```
@@ -645,6 +661,46 @@ Maps are used to represent a collection of related properties.
 Structs are sued to represent a "thing" with a lot of different properties.
 
 
+# INTERFACES
+
+We knoe values have types and functions must specifies the type of the args
+
+Does that mean EVERY function will be rewritten to accomodate different types even if they share the logic?
+Nope :) 
+
+Imagine the `func (d deck) shuffle()`. It will be also `func (s []int) shuffle()` , and so on.
+
+That's one of the problems interfaces try to solve.
+
+If we do this: 
+```
+type bot interface {
+	getGreeting() string
+}
+
+type englishBot struct {}
+type spanishBot struct {}
+```
+
+We just need to have a getGreeting with both bots as receivers:
+```
+func (englishBot) getGreeting() string {
+	//ommit the value 'eb' since it's not being used
+	// VERY custom logic for English blablabla
+	return "Hi!"
+}
+
+func (sb spanishBot) getGreeting() string {
+	// VERY custom logic for Spanish blablabla
+	return "Hola!"
+}
+```
+
+
+From the moment both spanishBot and englishBot have a function
+with them as receivers, and the bot interface declares that
+same function -> Both conform to the interface and then turn themselves
+into honorable members of type `bot`too.
 
 
 
