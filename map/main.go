@@ -13,6 +13,14 @@ func main() {
 		"white": "#ffffff",
 	}
 
+	// Adding elements to a map
+	colors["pink"] = "#e4a0d5ff"
+	colors["grey"] = "#afafafff"
+	colors["uglycolor"] = "#4e3035ff"
+
+	// Removing them
+	delete(colors, "uglycolor")
+
 	printMap(colors)
 }
 
