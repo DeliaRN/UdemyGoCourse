@@ -696,13 +696,26 @@ func (sb spanishBot) getGreeting() string {
 }
 ```
 
-
 From the moment both spanishBot and englishBot have a function
 with them as receivers, and the bot interface declares that
 same function -> Both conform to the interface and then turn themselves
 into honorable members of type `bot`too.
 
+So anything that mathces what is inside of the interface struct
+will then conform to that interface.
 
+- Interfaces are **not generic types** , Go doesn't have those.
+- Interfaces are **implicit**, we don't need to manually say that
+our custom type satisfies some interface
+- Interfaces are **a contract to help us manage types**, but if our
+custom type's implementation of a function is broken, then interfaces
+cannot help us there
+- Interfaces are **tough**, so we need to understand how to read them.
+It's important to know how to read interfaces in the standard lib.
+Writing your own interfaces is tough and requires experience.
+
+They are **not necessarily required**, but they are important for code
+maintainability, good practices, etc.
 
 # PACKAGES
 
@@ -733,3 +746,8 @@ It use a Seed as a 'source' in which is based the randomization.
 ## time
 func (t Time) UnixNano() int64 : It returns t as a Unix time, so everythime the application
 
+## net
+network 
+
+### net/http
+resp, err := http.Get("hhtp://example.com")
