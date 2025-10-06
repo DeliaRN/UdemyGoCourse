@@ -10,8 +10,8 @@ type fileReader struct{}
 
 func main() {
 
-	fmt.Println(os.Args) // command line arguments
-	file := os.Args[1]   // give mes the first argument after the program name
+	//fmt.Println(os.Args) // print the name of the argument passed
+	file := os.Args[1] // give mes the first argument after the program name
 
 	resp, err := os.Open(file)
 

@@ -923,9 +923,8 @@ We use Args variable to actually pass a value
 to that needed string name -referring to the file name-.
 
 
-
 ```
-fmt.Println(os.Args) // command line arguments
+fmt.Println(os.Args) // if we want to see the actual file
 file := os.Args[1]   // "give me the first argument after the program name"
 ```
 
@@ -939,9 +938,7 @@ type fileReader struct{}
 
 func main() {
 
-	fmt.Println(os.Args) 
 	file := os.Args[1] 
-
 	resp, err := os.Open(file)
 
 	if err != nil {
@@ -962,3 +959,20 @@ func (fileReader) Write(bs []byte) (int, error) {
 
 This is how we put all together to make a custom file reader
 That works directly from command line.
+
+If we want to make it short and without custom reader, we can address it like this:
+
+```
+func main() {
+	file, err := os.Open(os.Args[1])
+	if err!= nil {
+		fmt.Println("Error;", err)
+		os.Exit(1)
+	}
+
+	io.Copy(os.Stdout, file)
+}
+
+```
+
+:D
