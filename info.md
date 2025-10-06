@@ -869,3 +869,43 @@ is of type `File`.
 
 The type `File` itself implements the Write interface.
 
+
+If we hold command + click `Copy`, we can see it uses a `CopyBuffer`.
+
+We can see, it creates a byte slice of `size := 32 * 1024`.
+This is exactly what we did on our first approach `bs := make([]byte, 99999)`
+
+**_Dan dan daaaaaan~_**
+
+### Custom Writer:
+```
+type logWriter struct{}
+
+func (logWriter) Write(bs []byte) (int, error) {
+	return 1, nil 
+}
+```
+Just by defining this method, `logWriter` is now implements the Writer interface.
+
+We can return anything and it will work, but not really useful haha
+
+**How should we do it then?**
+
+From the Writer interface definition, we need to return the number of bytes written and an error value.
+
+We can use len(bs) to return the number of bytes written and nil for the error value, since we are not handling errors here
+
+```
+type logWriter struct{}
+
+func (logWriter) Write(bs []byte) (int, error) {
+	fmt.Println(string(bs))
+	return len(bs), nil
+}
+```
+
+In `main()` function, we would call it like in the code:
+```
+	lw := logWriter{}
+	io.Copy(lw, resp.Body)
+```
