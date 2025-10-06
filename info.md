@@ -975,4 +975,31 @@ func main() {
 
 ```
 
-:D
+**COOL THING HERE**
+If we wanted to print our main.go file with this program:
+```
+go run main.go main.go
+```
+We would get an error saying there's a file name collision.
+For doing that we should first run:
+```
+go build maing go
+```
+**Remember!** This will give an actual executable file called main
+
+So now, we can do:
+```
+./main main.go
+```
+
+This will print our `main.go` file with no collision, since the
+executable is `main`, and the text file to write is `main.go`.
+
+**Remember**
+
+- For Mac or Linux, we will run `./main`
+- For Windows, we will eun `main.exe`
+
+#### Note we did not push the built file of main, since they should NOT be pushed into repos.
+
+:)
