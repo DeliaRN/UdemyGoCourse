@@ -1,5 +1,6 @@
 # TIPS AND DOCUMENTATION ON GOLANG SYNTAX
 
+## THINGS TO REMEMBER: 
 ### **Strings can be declared out of functinos**, but they will cause an error if you try to use the short declaration operator outside of a function.
 
 ```var stringOutOfFunction string -> This is valid```
@@ -18,8 +19,7 @@
 
 This last line would be a redeclaration of the variable ```card``` and will cause an error
 
-
-## **Type is inferred**
+### **Type is inferred**
 
 If you write a function like this one
 
@@ -31,10 +31,18 @@ func newCard() string {
 
 when you use it: ```card := newCard()``` the type of ```card``` will be inferred to **string** since that's the returning type of ```NewCard()``` function.
 
+
+# KEY DOCUMENTATION EXPLAINED
+
 ## Type conversion
-Type we want (value we have)
-[]byte("Hi there!")
-Float(3)
+It follows scheme "Type we want (value we have)"
+eg:
+
+`[]byte("Hi there!")` -> transform string into byte slice
+
+`Float(3)` -> transform int into float
+
+`string(bs)` -> transform byte slice into string
 
 ```
 greeting := "Hi there!"
@@ -207,6 +215,8 @@ func HelloAndGoodbye(name string) (string, string) {
   return "Hello " + name, "Goodbye " + name
 }
 ```
+
+- Naked return (below)
 
 Values are returned using `return` keyword at the end of the function.
 There can be multiple `return` statements in a function.
@@ -751,3 +761,111 @@ network
 
 ### net/http
 resp, err := http.Get("hhtp://example.com")
+
+This function's signature is `func Get(url string) (resp *Response, err error)`.
+The response is a struct that follows:
+```
+type Response struct {
+	Status string //e.g "200 OK"
+	Status code //e.g 200
+	Proto string //e.g  "HTTP/1.0
+	ProtoMajor int //e.g 1
+	ProtoMinor int //e.g 0
+}
+```
+
+`Body`represents the response body. It's of type `io.ReadCloser`,
+wich has:
+- an `io.Reader` interface with function `Read([]byte) (int, error)`
+- an `io.Closer` interface with function `Close() (error)`
+
+So, for **reading the body**, we need a byte slice to be read:
+
+```
+	1 bs := make([]byte, 99999) 
+	2 resp.Body.Read(bs) 
+	3 fmt.Println(string(bs)) 
+```
+1. We first create a byte slice, empty but with a length of 99999,
+enough to hold any response.
+2. Then we `Read` from the response body and put it inside the byte slice
+3. Last, we convert the byte slice to string and print it.
+
+This leads us to the **io package**
+
+# io
+### Writer and Reader interfaces
+
+As we saw before, we can use Read `resp.Body.Read(bs)`, or we can use...
+
+```
+	io.Copy(os.Stdout, resp.Body)
+```
+
+We copy from a source (resp.Body) to a destination (os.Stdout)
+This is the most efficient way to Read from a stream
+
+The first approach takes a source of data (resp.Body)
+Then uses the Reader to read from that source
+Then gives us a byte slice with the data read from that source
+```
+	1 bs := make([]byte, 99999) 
+	2 resp.Body.Read(bs) 
+	3 fmt.Println(string(bs)) 
+```
+
+The second approach uses the Writer interface, explained in dept below
+It takes a bs (byte slice)
+Pass it to the Writer inferface, that will take information from inside
+of our program and send that data out of our program, to some form/channel/method of output.
+```
+	io.Copy(os.Stdout, resp.Body)
+```
+
+The source of output can be:
+- Outgoing HTTP request
+- Text file on hard drive
+- Image file on hard drive
+- Terminal/console (os.Stdout)
+
+The Writer interface has a method called Write()
+The Writer interface is implemented by many types in Go, including os.Stdout
+
+We need to find something in the standard library that implements the Writer interface
+and use that to log out all the data we're receiving from the Reader.
+
+## Writer
+The type Write is an interface that wraps the basic Write method.
+To satisfy this interface, your type (or the type we are using) mnust implement
+a function called `Write()`with signature:
+
+```
+Write(p []byte) (n int, err error)
+```
+
+The signature is similar to the Read function used before,
+but here the byte slice is used truly as a source of input.
+
+
+In the example before, we use `io.Copy`
+
+## Copy
+
+func Copy is another function from the io package.
+```
+func Copy(dst Writer, src Reader) (written int64, err error)
+```
+
+This function expects:
+- The first argument of some value that implements the Writer interface.
+- The second argument is something that implements the Reader interface.
+
+When we use `io.Copy(os.Stdout, resp.Body)`, we are doing exactly that.
+
+- `resp.Body`, the second arg, is the body field of the response struct, which implements.
+- `os.Stdout`, the first arg, is Standard out, which implements the Writer interface.
+If we hover over it, we can see `Stdout *File`which means that this standard value
+is of type `File`.
+
+The type `File` itself implements the Write interface.
+
