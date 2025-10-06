@@ -909,3 +909,56 @@ In `main()` function, we would call it like in the code:
 	lw := logWriter{}
 	io.Copy(lw, resp.Body)
 ```
+
+## io.Open and os.Args
+
+Open function's signature:
+```
+func Open(name string) (*File, error)
+```
+
+It needs a file to work with, and returns the file named and an error.
+
+We use Args variable to actually pass a value
+to that needed string name -referring to the file name-.
+
+
+
+```
+fmt.Println(os.Args) // command line arguments
+file := os.Args[1]   // "give me the first argument after the program name"
+```
+
+When we run `go run main.go`, an argument is expected after:
+
+`go run main.go text.txt`. This argument, `text.txt`, will be the file used 
+to be Open and worked with.
+
+```
+type fileReader struct{}
+
+func main() {
+
+	fmt.Println(os.Args) 
+	file := os.Args[1] 
+
+	resp, err := os.Open(file)
+
+	if err != nil {
+		fmt.Println("Error: ", err)
+		os.Exit(1)
+	}
+
+	fr := fileReader{}
+	io.Copy(fr, resp)
+}
+
+func (fileReader) Write(bs []byte) (int, error) {
+	fmt.Println(string(bs))
+	fmt.Println("Just wrote this many bytes: ", len(bs))
+	return len(bs), nil
+}
+```
+
+This is how we put all together to make a custom file reader
+That works directly from command line.
