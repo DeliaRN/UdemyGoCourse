@@ -253,6 +253,19 @@ func SumAndMultiply(a, b int) (int, int) {
 Called like this: `aplusb, atimesb := SumAndMultiply(a, b)`
 
 
+## Function literals
+They are like lambda functions and anonymous functions.
+
+we do 
+```
+go func() {
+	//code
+}()
+```
+It needs parenthesis both at the start and at the end, because at the end we need to call/invoke the actual function.
+
+
+
 
 ### Named Return Values and Naked Return
 As well as parameters, return values can optionally be named.
@@ -727,6 +740,176 @@ Writing your own interfaces is tough and requires experience.
 They are **not necessarily required**, but they are important for code
 maintainability, good practices, etc.
 
+# GO ROUTINES
+
+When er run a go program, we automatically create a Go Routine. It's something that exists insidde of our running program or process.
+
+It takes every line of code inside the program, and executes them one by one (taking into account that all code that we are writing gets compiled, it's not literally line by line)
+
+In our code:
+```
+func main() {
+
+	links := []string{
+		"https://www.google.com",
+		//...
+		"https://amazon.com",
+	}
+
+	for _, link := range links {
+		checkLink(link)
+	}
+}
+
+func checkLink(link string) {
+	_, err := http.Get(link)
+
+	if err != nil {
+		fmt.Println(link, "might be down!")
+		return
+	}
+	fmt.Println(link, "is up!")
+}
+
+```
+
+Here, Main Go routine goes:
+- create slice
+- go through for loop
+- get to line `_, err := http.Get(link)``
+
+This is a **BLOCKING CALL**, because the code inside takes some ammount of time to run, and the Main Go Routine cannot do anything else. It just freezes and waits.
+
+**_That's why we launch different Go Routines._**
+
+We can do:
+```
+func main() {
+
+	links := []string{
+		"https://www.google.com",
+		//...
+		"https://amazon.com",
+	}
+
+	for _, link := range links {
+		go checkLink(link)
+	}
+}
+```
+
+Using `go` keyword, we automatically tell go to run a new Go Rountine specificly for `checkLink()` function.
+
+Like this, Main Routine will be spawning new Go Routines, until there's the same number of routines as blocking calls.
+
+## Rules and theory about Go routines:
+
+Behind the scenes, there is a Go Scheduler, and it works with one CPU core by default. Ir runs one routine until it finishes, or makes a blocking call, like an HTTP request.
+so the scheduler mointors the code that is inside of each Go Routine. As soon as the scheduler detects that one routine has finished running all the code inside of it or has made a blocking call, the Scheduler pauses it and proceeds with the next one. They are not really running in parallel. 
+
+When we have multiple CPU cores, each one can run a go routine.  So the scheduler tuns one thread on each "logical" core.
+
+**Concurrency is no parallelism**. When a program is using concurrency, it means that it is concurrent if it has the ability to load up multiple go routines at a time.
+The program is concurrent because it can run different things kind of at the same time, but not actually.
+
+Parallelism happens only when we have, for example, two separate cores picking different routines and running them in parallel, at the exact same time.
+
+Concurrency is more about scheduling, like multitasking. We are not actually doing many things at the exact same time.
+Parallelism is like reading while listening to music.
+
+The routines created with the `go` keyword are called _Child routines_. The Main routine is created when we launched our program.
+
+
+The Main routine does not care about whether the child rountines are still on go. It will finish when it's done doing its thing, and the entire program will quit automatically.
+
+So, if we do:
+```
+	for _, link := range links {
+		go checkLink(link)
+	}
+```
+The program won't really do anything, because the main routine will end before the child routines are done.
+
+That's where **Channels** enter the room
+
+## CHANNELS
+
+With Channels, we can communicate between routines
+They work as an intermediate between child go routines and main routine.
+
+Channels are typed, so the information we pass through a channel, it will be all of the same type.
+If we make a Channel of type string, we won't be able to pass ints or floats through it.
+
+The scope of channels follows the same logic as for any other variable in Go.
+
+Everytime a child go routine is created, Main routine waits on the receiver point for answer, like in `fmt.Println(<-c)`, because it's also a blocking call.
+
+As soon as the Go Runtime sees that we want to receive a message from a channel, says "Oh, this routine is waiting for something to happen, there's no other code to run then, just pause and wait for something to happen. Then that "something" happens, and the routine continues execution with the first answer it receives, without waiting for the rest to arrive. 
+
+That's why if our code is:
+```
+	c := make(chan string)
+
+	for _, link := range links {
+		go checkLink(link, c)
+	}
+
+	fmt.Println(<-c)
+```
+
+we will only see in terminal over and over again
+```
+go run main.go
+https://www.facebook.com is up!
+is up!
+```
+
+Because that's the one that loaded the fastest.
+
+So, we need to remember that **Receiving messages from the channel IS a blocking call**.
+
+So, if the number of receiving calls is less than the number of made calls, the program will finish before finishing...
+
+But if the number of receiving calls is BIGGER than the number of calls we want to make, the program will hang waiting for more calls to arrive (and that won't happen)
+
+```
+	for _, link := range links {
+		go checkLink(link, c)
+	}
+
+	for i  := 0; i < len(links); i++ {
+		fmt.Println(<-c) 
+	}
+```
+
+That's how we fix it.
+
+If we want to constantly heck for the same links in loop
+- one routine checks for google over again
+- one routine checks for amazon over again
+- etc 
+
+So what we do is: whenever the checklink function is completed, rather than returning/pushin string into the channel... We will take that link, and push it back to the channel.
+
+We can also have **INFINITE LOOPS**
+```
+	for _, link := range links {
+		go checkLink(link, c)
+		
+	}
+
+	for { // infinite loop
+		go checkLink(<-c, c)
+	}
+```
+We can pause go routines, but this will also pause the main routine.
+```
+time.Sleep(time.Second)
+```
+The main routine must always be awake, waiting for child routines to return their answers.
+
+
+_
 # PACKAGES
 
 ## ioutil or os
@@ -754,7 +937,29 @@ It use a Seed as a 'source' in which is based the randomization.
 ```func (r *Rand) Intn(n int) int```
 
 ## time
-func (t Time) UnixNano() int64 : It returns t as a Unix time, so everythime the application
+#### _func (t Time) UnixNano() int64_
+It returns t as a Unix time, so everythime the application.
+___
+#### _func Sleep(d Duration)_
+It pauses the current go routine for at least the duration of `d`
+
+This `Duration` is a type that stablishes constant values. 1 Duration is 1 Nanosecond.
+
+1 Microsecond = 1000 * Nanosecond
+
+1 Millisecond = 1000 * Microsecond
+
+1 Second = 1000 * Millisecond
+
+1 Minute = 60 * Second
+
+1 Hour = 60 * Minute
+
+So, this allows us to use `time.Second`, for example, and pass it as an argument for `Sleep`.
+```
+time.Sleep(time.Second)
+```
+
 
 ## net
 network 
